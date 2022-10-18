@@ -1,0 +1,22 @@
+{
+    "device_manager_url": "",
+    "device_selection_url": "",
+    "worker_param_prefix": "device_repository.",
+    "create_device_group_module_type": "device_repository_create_device_group",
+    "default_name_prefix": "smart-service generated: ",
+    "attribute_origin": "smart-service",
+
+    "smart_service_repository_url": "",
+    "camunda_url": "",
+    "camunda_worker_id": "device_repository",
+    "camunda_worker_topic": "device_repository",
+    "camunda_lock_duration_in_ms": 60000,
+    "camunda_worker_wait_duration_in_ms": 1000,
+    "camunda_fetch_max_tasks": 100,
+
+    "auth_endpoint": "",
+    "auth_client_id": "",
+    "auth_client_secret": "",
+    "token_cache_default_expiration_in_seconds": 60,
+    "token_cache_size_in_mb": 20
+}
