@@ -46,34 +46,20 @@ func (this *ProcessDeploymentStart) getDeviceGroupDeviceIds(task model.CamundaEx
 		return nil, false, nil
 	}
 	list := []interface{}{}
-	list, ok = variable.Value.([]interface{})
-	if !ok {
-		temp := []string{}
-		temp, ok = variable.Value.([]string)
-		if ok {
-			return deviceIds, true, nil
+	switch temp := variable.Value.(type) {
+	case string:
+		err = json.Unmarshal([]byte(temp), &list)
+		if err != nil {
+			return nil, true, fmt.Errorf("unable to unmarshal value of %v to []interface{}: %w", key, err)
 		}
+	case []string:
 		for _, str := range temp {
-			var id string
-			id, ok = extractDeviceIdFromString(str)
-			if ok {
-				deviceIds = append(deviceIds, id)
-			}
+			list = append(list, str)
 		}
-		return deviceIds, true, nil
-	}
-	if !ok {
-		var jsonStr string
-		jsonStr, ok = variable.Value.(string)
-		if ok {
-			err = json.Unmarshal([]byte(jsonStr), &list)
-			if err != nil {
-				return nil, true, fmt.Errorf("unable to unmarshal value of %v to []interface{}: %w", key, err)
-			}
-		}
-	}
-	if !ok {
-		return nil, true, fmt.Errorf("unable to interpret value of %v (%#v)", key, variable.Value)
+	case []interface{}:
+		list = temp
+	default:
+		return nil, false, fmt.Errorf("unable to interpret value of %v (%#v)", key, variable.Value)
 	}
 
 	for _, element := range list {

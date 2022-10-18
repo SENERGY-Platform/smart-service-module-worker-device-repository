@@ -29,6 +29,9 @@ import (
 )
 
 func (this *ProcessDeploymentStart) createDeviceGroup(token auth.Token, task model.CamundaExternalTask, ids []string, name string) (groupId string, err error) {
+	if ids == nil {
+		ids = []string{}
+	}
 	deviceGroup := devicemodel.DeviceGroup{
 		Name:      name,
 		Criteria:  nil,
@@ -56,7 +59,10 @@ func (this *ProcessDeploymentStart) createDeviceGroup(token auth.Token, task mod
 			},
 		},
 	}
-	deviceGroup.Criteria, err = this.getDeviceGroupCriteria(token, ids)
+	if len(ids) > 0 {
+		deviceGroup.Criteria, err = this.getDeviceGroupCriteria(token, ids)
+	}
+
 	if err != nil {
 		return groupId, err
 	}
