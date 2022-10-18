@@ -33,7 +33,7 @@ func (this *ProcessDeploymentStart) getName(task model.CamundaExternalTask) stri
 		return defaultName
 	}
 	result, ok := variable.Value.(string)
-	if !ok {
+	if !ok || result == "" {
 		return defaultName
 	}
 	return result
