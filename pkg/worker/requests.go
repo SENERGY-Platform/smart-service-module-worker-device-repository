@@ -44,18 +44,18 @@ func (this *ProcessDeploymentStart) createDeviceGroup(token auth.Token, task mod
 			},
 			{
 				Key:    "smart_service_task",
-				Value:  "true",
-				Origin: task.Id,
+				Value:  task.Id,
+				Origin: this.config.AttributeOrigin,
 			},
 			{
 				Key:    "smart_service_instance",
-				Value:  "true",
-				Origin: task.ProcessInstanceId,
+				Value:  task.ProcessInstanceId,
+				Origin: this.config.AttributeOrigin,
 			},
 			{
 				Key:    "smart_service_definition",
-				Value:  "true",
-				Origin: task.ProcessDefinitionId,
+				Value:  task.ProcessDefinitionId,
+				Origin: this.config.AttributeOrigin,
 			},
 		},
 	}
