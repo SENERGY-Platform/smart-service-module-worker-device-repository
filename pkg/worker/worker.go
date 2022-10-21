@@ -17,6 +17,7 @@
 package worker
 
 import (
+	"encoding/json"
 	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/auth"
 	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/configuration"
 	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/model"
@@ -70,6 +71,11 @@ func (this *ProcessDeploymentStart) Do(task model.CamundaExternalTask) (modules 
 			return modules, outputs, err
 		}
 		moduleData["device_group_id"] = deviceGroupId
+		iotOption := model.IotOption{
+			DeviceGroupSelection: &model.DeviceGroupSelection{Id: deviceGroupId},
+		}
+		iotOptionJson, _ := json.Marshal(iotOption)
+		moduleData["device_group_iot_option"] = string(iotOptionJson)
 		modules = append(modules, model.Module{
 			Id:               this.getModuleId(task, "create_device_group"),
 			ProcesInstanceId: task.ProcessInstanceId,
