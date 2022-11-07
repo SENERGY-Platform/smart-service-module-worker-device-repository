@@ -25,6 +25,7 @@ import (
 	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/model"
 	"io"
 	"net/http"
+	"net/url"
 	"runtime/debug"
 )
 
@@ -93,6 +94,73 @@ func (this *ProcessDeploymentStart) createDeviceGroup(token auth.Token, task mod
 	}
 	err = json.NewDecoder(resp.Body).Decode(&deviceGroup)
 	groupId = deviceGroup.Id
+	return
+}
+
+func (this *ProcessDeploymentStart) updateDeviceGroup(token auth.Token, task model.CamundaExternalTask, ids []string, name string, groupId string) (err error) {
+	if ids == nil {
+		ids = []string{}
+	}
+	deviceGroup := devicemodel.DeviceGroup{
+		Id:        groupId,
+		Name:      name,
+		Criteria:  nil,
+		DeviceIds: ids,
+		Attributes: []devicemodel.Attribute{
+			{
+				Key:    "platform/generated",
+				Value:  "true",
+				Origin: this.config.AttributeOrigin,
+			},
+			{
+				Key:    "platform/smart_service_task",
+				Value:  task.Id,
+				Origin: this.config.AttributeOrigin,
+			},
+			{
+				Key:    "platform/smart_service_instance",
+				Value:  task.ProcessInstanceId,
+				Origin: this.config.AttributeOrigin,
+			},
+			{
+				Key:    "platform/smart_service_definition",
+				Value:  task.ProcessDefinitionId,
+				Origin: this.config.AttributeOrigin,
+			},
+		},
+	}
+	if len(ids) > 0 {
+		deviceGroup.Criteria, err = this.getDeviceGroupCriteria(token, ids)
+	}
+
+	if err != nil {
+		return err
+	}
+	payload := new(bytes.Buffer)
+	err = json.NewEncoder(payload).Encode(deviceGroup)
+	if err != nil {
+		debug.PrintStack()
+		return err
+	}
+	req, err := http.NewRequest("PUT", this.config.DeviceManagerUrl+"/device-groups/"+url.PathEscape(groupId), payload)
+	if err != nil {
+		debug.PrintStack()
+		return err
+	}
+	req.Header.Set("Authorization", token.Jwt())
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		debug.PrintStack()
+		return err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode >= 300 {
+		temp, _ := io.ReadAll(resp.Body)
+		err = errors.New(string(temp))
+		debug.PrintStack()
+		return err
+	}
 	return
 }
 

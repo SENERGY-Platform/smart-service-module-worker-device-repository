@@ -39,6 +39,19 @@ func (this *ProcessDeploymentStart) getName(task model.CamundaExternalTask) stri
 	return result
 }
 
+// if no key is set: return nil
+func (this *ProcessDeploymentStart) getModuleKey(task model.CamundaExternalTask) (key *string) {
+	variable, ok := task.Variables[this.config.WorkerParamPrefix+"key"]
+	if !ok {
+		return nil
+	}
+	result, ok := variable.Value.(string)
+	if ok {
+		return &result
+	}
+	return nil
+}
+
 func (this *ProcessDeploymentStart) getDeviceGroupDeviceIds(task model.CamundaExternalTask) (deviceIds []string, used bool, err error) {
 	key := this.config.WorkerParamPrefix + "create_device_group"
 	variable, ok := task.Variables[key]

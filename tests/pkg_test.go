@@ -102,7 +102,9 @@ func runTest(t *testing.T, testCaseLocation string, config worker.Config, libCon
 	}
 	config.DeviceSelectionUrl = deviceSelection.Start(ctx, wg)
 
-	smartServiceRepo := mocks.NewSmartServiceRepoMock(libConf, config)
+	moduleListResponse, _ := os.ReadFile(testCaseLocation + "/module_list_response.json")
+
+	smartServiceRepo := mocks.NewSmartServiceRepoMock(libConf, config, moduleListResponse)
 	libConf.SmartServiceRepositoryUrl = smartServiceRepo.Start(ctx, wg)
 
 	err = pkg.Start(ctx, wg, config, libConf)

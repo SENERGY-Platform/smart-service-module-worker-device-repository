@@ -17,12 +17,10 @@
 package worker
 
 import (
-	"encoding/json"
 	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/auth"
 	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/configuration"
 	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/model"
 	"log"
-	"net/url"
 	"runtime/debug"
 )
 
@@ -40,6 +38,7 @@ type ProcessDeploymentStart struct {
 type SmartServiceRepo interface {
 	GetInstanceUser(instanceId string) (userId string, err error)
 	UseModuleDeleteInfo(info model.ModuleDeleteInfo) error
+	ListExistingModules(processInstanceId string, query model.ModulQuery) (result []model.SmartServiceModule, err error)
 }
 
 func (this *ProcessDeploymentStart) Do(task model.CamundaExternalTask) (modules []model.Module, outputs map[string]interface{}, err error) {
@@ -60,43 +59,30 @@ func (this *ProcessDeploymentStart) Do(task model.CamundaExternalTask) (modules 
 		return modules, outputs, err
 	}
 
-	moduleData := map[string]interface{}{}
+	outputs = map[string]interface{}{}
 
 	name := this.getName(task)
 
+	key := this.getModuleKey(task)
+
 	if createDeviceGroup {
-		deviceGroupId, err := this.createDeviceGroup(token, task, deviceGroupDeviceIds, name)
+		module, returnData, err := this.handleDeviceGroupCommand(token, task, deviceGroupDeviceIds, name, key)
 		if err != nil {
-			log.Println("ERROR:", err)
-			return modules, outputs, err
+			return modules, returnData, err
 		}
-		moduleData["device_group_id"] = deviceGroupId
-		iotOption := model.IotOption{
-			DeviceGroupSelection: &model.DeviceGroupSelection{Id: deviceGroupId},
+		modules = append(modules, module)
+		for k, v := range returnData {
+			outputs[k] = v
 		}
-		iotOptionJson, _ := json.Marshal(iotOption)
-		moduleData["device_group_iot_option"] = string(iotOptionJson)
-		modules = append(modules, model.Module{
-			Id:               this.getModuleId(task, "create_device_group"),
-			ProcesInstanceId: task.ProcessInstanceId,
-			SmartServiceModuleInit: model.SmartServiceModuleInit{
-				DeleteInfo: &model.ModuleDeleteInfo{
-					Url:    this.config.DeviceManagerUrl + "/device-groups/" + url.PathEscape(deviceGroupId),
-					UserId: userId,
-				},
-				ModuleType: this.config.CreateDeviceGroupModuleType,
-				ModuleData: moduleData,
-			},
-		})
 	}
 
-	return modules, moduleData, err
+	return modules, outputs, err
 }
 
 func (this *ProcessDeploymentStart) Undo(modules []model.Module, reason error) {
 	log.Println("UNDO:", reason)
 	for _, module := range modules {
-		if module.DeleteInfo != nil {
+		if module.DeleteInfo != nil && !isUpdate(module) {
 			err := this.smartServiceRepo.UseModuleDeleteInfo(*module.DeleteInfo)
 			if err != nil {
 				log.Println("ERROR:", err)
@@ -104,6 +90,25 @@ func (this *ProcessDeploymentStart) Undo(modules []model.Module, reason error) {
 			}
 		}
 	}
+}
+
+const ModuleUpdateVersionField = "module_update_version"
+
+func isUpdate(module model.Module) bool {
+	_, versionFieldExists := module.ModuleData[ModuleUpdateVersionField]
+	return versionFieldExists
+}
+
+func setModuleUpdateVersion(module *model.Module) {
+	version, versionFieldExists := module.ModuleData[ModuleUpdateVersionField]
+	if !versionFieldExists {
+		module.ModuleData[ModuleUpdateVersionField] = 1
+	}
+	versionNum, versionIsNum := version.(float64)
+	if !versionIsNum {
+		module.ModuleData[ModuleUpdateVersionField] = 1
+	}
+	module.ModuleData[ModuleUpdateVersionField] = versionNum + 1
 }
 
 func (this *ProcessDeploymentStart) getModuleId(task model.CamundaExternalTask, suffix string) string {

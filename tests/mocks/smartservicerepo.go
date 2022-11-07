@@ -32,15 +32,16 @@ import (
 	"sync"
 )
 
-func NewSmartServiceRepoMock(libConfig configuration.Config, config worker.Config) *SmartServiceRepoMock {
-	return &SmartServiceRepoMock{libConfig: libConfig, config: config}
+func NewSmartServiceRepoMock(libConfig configuration.Config, config worker.Config, moduleListResponse []byte) *SmartServiceRepoMock {
+	return &SmartServiceRepoMock{libConfig: libConfig, config: config, moduleListResponse: moduleListResponse}
 }
 
 type SmartServiceRepoMock struct {
-	requestsLog []Request
-	mux         sync.Mutex
-	libConfig   configuration.Config
-	config      worker.Config
+	requestsLog        []Request
+	mux                sync.Mutex
+	libConfig          configuration.Config
+	config             worker.Config
+	moduleListResponse []byte
 }
 
 func (this *SmartServiceRepoMock) PopRequestLog() []Request {
@@ -97,6 +98,17 @@ func (this *SmartServiceRepoMock) getRouter() http.Handler {
 			Message:  msg,
 		})
 		writer.Write(temp)
+	})
+
+	router.GET("/instances-by-process-id/:id/modules", func(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+		temp, _ := io.ReadAll(request.Body)
+		msg := strings.ReplaceAll(string(temp), this.config.DeviceManagerUrl, "http://localhost")
+		this.logRequest(Request{
+			Method:   request.Method,
+			Endpoint: request.URL.Path + "?" + request.URL.Query().Encode(),
+			Message:  msg,
+		})
+		writer.Write(this.moduleListResponse)
 	})
 
 	router.GET("/instances-by-process-id/:id/user-id", func(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
