@@ -6,6 +6,8 @@ github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-2022102706461
 github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20221027064615-5557fe124266/go.mod h1:o7mZ2VanXVpRrT3JmDc3ohIXn20fBrCb6lqXDEuxApE=
 github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20221108102427-78bcce22041a h1:l/J+XUdZBc7wcLr9v0HJGg1AmjsdVKB5ixBAqJeiFUI=
 github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20221108102427-78bcce22041a/go.mod h1:o7mZ2VanXVpRrT3JmDc3ohIXn20fBrCb6lqXDEuxApE=
+github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20221108112635-50c2c3ccf5f1 h1:rxul85auIyzhlCX+zSsAXhg3FvMj3Ca9rtKeNkwhJEM=
+github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20221108112635-50c2c3ccf5f1/go.mod h1:o7mZ2VanXVpRrT3JmDc3ohIXn20fBrCb6lqXDEuxApE=
 github.com/cespare/xxhash/v2 v2.1.2 h1:YRXhKfTDauu4ajMg1TPgFO5jnlC2HCbmLXMcTG5cbYE=
 github.com/cespare/xxhash/v2 v2.1.2/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
 github.com/coocood/freecache v1.2.1 h1:/v1CqMq45NFH9mp/Pt142reundeBM0dVUD3osQBeu/U=
