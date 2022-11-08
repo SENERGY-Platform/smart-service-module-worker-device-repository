@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/SENERGY-Platform/device-manager v0.0.0-20221012084225-0d325fb49872
-	github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20221027064615-5557fe124266
+	github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20221108102427-78bcce22041a
 	github.com/julienschmidt/httprouter v1.3.0
 )
 
