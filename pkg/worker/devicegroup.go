@@ -102,6 +102,9 @@ func (this *ProcessDeploymentStart) getExistingModule(processInstanceId string, 
 		log.Println("ERROR:", err)
 		return module, false, err
 	}
+	if this.config.Debug {
+		log.Printf("DEBUG: existing module request: %v, %v, %v, \n %#v", processInstanceId, key, moduleType, existingModules)
+	}
 	if len(existingModules) == 0 {
 		return module, false, nil
 	}
