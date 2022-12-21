@@ -2,6 +2,8 @@ github.com/SENERGY-Platform/device-manager v0.0.0-20221012084225-0d325fb49872 h1
 github.com/SENERGY-Platform/device-manager v0.0.0-20221012084225-0d325fb49872/go.mod h1:PEdXjSmzOYEMPMmDX6I/0itUyFQO5+SWWQcdzK8Ezp8=
 github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20221216090404-75b6632e7fbf h1:7LXDhHyV1ge6I+63DpKcFdK2wvw/vm9hPrWfrWqVLzg=
 github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20221216090404-75b6632e7fbf/go.mod h1:HhYJIX0eFmLGDyZR40OL7A17bNLGjpa69d09py3vsKU=
+github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20221221115706-e33fe6961783 h1:ZlPP2sdXTsYjnUP0Ysc0Wr4qSeETB1d10Tc+sKRch6o=
+github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20221221115706-e33fe6961783/go.mod h1:HhYJIX0eFmLGDyZR40OL7A17bNLGjpa69d09py3vsKU=
 github.com/cespare/xxhash/v2 v2.1.2 h1:YRXhKfTDauu4ajMg1TPgFO5jnlC2HCbmLXMcTG5cbYE=
 github.com/cespare/xxhash/v2 v2.1.2/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
 github.com/coocood/freecache v1.2.1 h1:/v1CqMq45NFH9mp/Pt142reundeBM0dVUD3osQBeu/U=
