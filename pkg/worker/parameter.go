@@ -19,7 +19,7 @@ package worker
 import (
 	"encoding/json"
 	"fmt"
-	devicemodel "github.com/SENERGY-Platform/device-manager/lib/model"
+	devicemodel "github.com/SENERGY-Platform/models/go/models"
 	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/model"
 	"strings"
 )
