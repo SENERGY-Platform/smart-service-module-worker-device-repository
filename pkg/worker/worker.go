@@ -17,15 +17,21 @@
 package worker
 
 import (
+	"context"
 	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/auth"
 	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/configuration"
 	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/model"
 	"log"
 	"runtime/debug"
+	"sync"
 )
 
-func New(config Config, libConfig configuration.Config, auth *auth.Auth, smartServiceRepo SmartServiceRepo) *ProcessDeploymentStart {
-	return &ProcessDeploymentStart{config: config, libConfig: libConfig, auth: auth, smartServiceRepo: smartServiceRepo}
+func New(ctx context.Context, wg *sync.WaitGroup, config Config, libConfig configuration.Config, auth *auth.Auth, smartServiceRepo SmartServiceRepo) (*ProcessDeploymentStart, error) {
+	err := StartDoneEventHandling(ctx, wg, config, libConfig)
+	if err != nil {
+		return nil, err
+	}
+	return &ProcessDeploymentStart{config: config, libConfig: libConfig, auth: auth, smartServiceRepo: smartServiceRepo}, nil
 }
 
 type ProcessDeploymentStart struct {
