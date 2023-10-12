@@ -39,7 +39,7 @@ func StartDoneEventHandling(ctx context.Context, wg *sync.WaitGroup, config Conf
 				return nil //ignore  message
 			}
 			if msg.Command == "PUT" && msg.Handler != "github.com/SENERGY-Platform/permission-search" {
-				eventId := idToEventId(msg.ResourceKind + "_" + msg.ResourceId)
+				eventId := idToEventId(msg.ResourceId)
 				err = camunda.SendEventTrigger(libConfig, eventId, nil)
 				if err != nil {
 					log.Println("ERROR: unable to send event trigger:", err)

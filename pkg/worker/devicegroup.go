@@ -42,6 +42,7 @@ func (this *ProcessDeploymentStart) handleDeviceGroupCreate(token auth.Token, ta
 		log.Println("ERROR:", err)
 		return module, outputs, err
 	}
+	outputs["done_event"] = idToEventId(deviceGroupId)
 	outputs[DeviceGroupIdOutputFieldName] = deviceGroupId
 	iotOption := model.IotOption{
 		DeviceGroupSelection: &model.DeviceGroupSelection{Id: deviceGroupId},
