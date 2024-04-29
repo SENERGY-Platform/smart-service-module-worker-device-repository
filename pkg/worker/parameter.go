@@ -21,6 +21,8 @@ import (
 	"fmt"
 	devicemodel "github.com/SENERGY-Platform/models/go/models"
 	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/model"
+	"log"
+	"strconv"
 	"strings"
 )
 
@@ -37,6 +39,24 @@ func (this *ProcessDeploymentStart) getName(task model.CamundaExternalTask) stri
 		return defaultName
 	}
 	return result
+}
+
+func (this *ProcessDeploymentStart) getWaitSetting(task model.CamundaExternalTask) bool {
+	variable, ok := task.Variables[this.config.WorkerParamPrefix+"wait"]
+	if !ok {
+		return false
+	}
+	waitStr, ok := variable.Value.(string)
+	if !ok || waitStr == "" {
+		return false
+	}
+
+	wait, err := strconv.ParseBool(waitStr)
+	if err != nil {
+		log.Printf("WARNING: unable to parse wait value %#v --> default to false", waitStr)
+		return false
+	}
+	return wait
 }
 
 // if no key is set: return nil

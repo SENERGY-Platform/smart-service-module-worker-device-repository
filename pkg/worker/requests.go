@@ -29,7 +29,7 @@ import (
 	"runtime/debug"
 )
 
-func (this *ProcessDeploymentStart) createDeviceGroup(token auth.Token, task model.CamundaExternalTask, ids []string, name string) (groupId string, err error) {
+func (this *ProcessDeploymentStart) createDeviceGroup(token auth.Token, task model.CamundaExternalTask, ids []string, name string, wait bool) (groupId string, err error) {
 	if ids == nil {
 		ids = []string{}
 	}
@@ -73,7 +73,11 @@ func (this *ProcessDeploymentStart) createDeviceGroup(token auth.Token, task mod
 		debug.PrintStack()
 		return groupId, err
 	}
-	req, err := http.NewRequest("POST", this.config.DeviceManagerUrl+"/device-groups", payload)
+	query := ""
+	if wait {
+		query = "?wait=true"
+	}
+	req, err := http.NewRequest("POST", this.config.DeviceManagerUrl+"/device-groups"+query, payload)
 	if err != nil {
 		debug.PrintStack()
 		return groupId, err
@@ -97,7 +101,7 @@ func (this *ProcessDeploymentStart) createDeviceGroup(token auth.Token, task mod
 	return
 }
 
-func (this *ProcessDeploymentStart) updateDeviceGroup(token auth.Token, task model.CamundaExternalTask, ids []string, name string, groupId string) (err error) {
+func (this *ProcessDeploymentStart) updateDeviceGroup(token auth.Token, task model.CamundaExternalTask, ids []string, name string, groupId string, wait bool) (err error) {
 	if ids == nil {
 		ids = []string{}
 	}
@@ -142,7 +146,11 @@ func (this *ProcessDeploymentStart) updateDeviceGroup(token auth.Token, task mod
 		debug.PrintStack()
 		return err
 	}
-	req, err := http.NewRequest("PUT", this.config.DeviceManagerUrl+"/device-groups/"+url.PathEscape(groupId), payload)
+	query := ""
+	if wait {
+		query = "?wait=true"
+	}
+	req, err := http.NewRequest("PUT", this.config.DeviceManagerUrl+"/device-groups/"+url.PathEscape(groupId)+query, payload)
 	if err != nil {
 		debug.PrintStack()
 		return err

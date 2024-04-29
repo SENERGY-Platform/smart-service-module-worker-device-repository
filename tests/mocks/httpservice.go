@@ -107,9 +107,13 @@ func (this *HttpService) logRequest(request *http.Request) {
 	this.mux.Lock()
 	defer this.mux.Unlock()
 	temp, _ := io.ReadAll(request.Body)
+	query := request.URL.RawQuery
+	if query != "" {
+		query = "?" + query
+	}
 	this.requestsLog = append(this.requestsLog, Request{
 		Method:   request.Method,
-		Endpoint: request.URL.Path,
+		Endpoint: request.URL.Path + query,
 		Message:  string(temp),
 	})
 }
@@ -122,9 +126,13 @@ func (this *HttpService) logRequestWithMessage(request *http.Request, m interfac
 		temp, _ := json.Marshal(m)
 		message = string(temp)
 	}
+	query := request.URL.RawQuery
+	if query != "" {
+		query = "?" + query
+	}
 	this.requestsLog = append(this.requestsLog, Request{
 		Method:   request.Method,
-		Endpoint: request.URL.Path,
+		Endpoint: request.URL.Path + query,
 		Message:  message,
 	})
 }

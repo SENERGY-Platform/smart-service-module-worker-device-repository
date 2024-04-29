@@ -37,7 +37,7 @@ const DeviceGroupIdOutputFieldName = "device_group_id"
 
 func (this *ProcessDeploymentStart) handleDeviceGroupCreate(token auth.Token, task model.CamundaExternalTask, deviceIds []string, name string, keys []string) (module model.Module, outputs map[string]interface{}, err error) {
 	outputs = map[string]interface{}{}
-	deviceGroupId, err := this.createDeviceGroup(token, task, deviceIds, name)
+	deviceGroupId, err := this.createDeviceGroup(token, task, deviceIds, name, this.getWaitSetting(task))
 	if err != nil {
 		log.Println("ERROR:", err)
 		return module, outputs, err
@@ -85,7 +85,7 @@ func (this *ProcessDeploymentStart) handleDeviceGroupCommandWithKey(token auth.T
 	}
 
 	outputs = module.ModuleData
-	err = this.updateDeviceGroup(token, task, deviceIds, name, deviceGroupId)
+	err = this.updateDeviceGroup(token, task, deviceIds, name, deviceGroupId, this.getWaitSetting(task))
 	if err != nil {
 		log.Println("ERROR:", err)
 		return module, outputs, err
