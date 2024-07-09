@@ -4,7 +4,7 @@ go 1.22
 
 require (
 	github.com/SENERGY-Platform/models/go v0.0.0-20240627082833-157bd627a94f
-	github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20240628113344-65d284a6f459
+	github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20240709113752-d255ce112aeb
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/segmentio/kafka-go v0.4.47
 )
@@ -15,9 +15,9 @@ require (
 	github.com/IBM/sarama v1.43.2 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/Microsoft/hcsshim v0.12.4 // indirect
-	github.com/SENERGY-Platform/device-repository v0.0.28 // indirect
-	github.com/SENERGY-Platform/permission-search v0.0.14 // indirect
-	github.com/SENERGY-Platform/service-commons v0.0.0-20240423132428-8eccbc027e71 // indirect
+	github.com/SENERGY-Platform/device-repository v0.0.30 // indirect
+	github.com/SENERGY-Platform/permission-search v0.0.16 // indirect
+	github.com/SENERGY-Platform/service-commons v0.0.0-20240708085423-94423a495d7f // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/containerd/containerd v1.7.18 // indirect
 	github.com/containerd/errdefs v0.1.0 // indirect
