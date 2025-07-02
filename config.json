@@ -23,5 +23,7 @@
 
     "kafka_url": "",
     "kafka_consumer_group": "smart-service-module-worker-device-repository",
-    "permissions_done_topic": "permissions_done"
+    "permissions_done_topic": "permissions_done",
+
+    "init_topics": false
 }

@@ -28,4 +28,6 @@ type Config struct {
 	KafkaUrl             string `json:"kafka_url"`
 	KafkaConsumerGroup   string `json:"kafka_consumer_group"`
 	PermissionsDoneTopic string `json:"permissions_done_topic"`
+
+	InitTopics bool `json:"init_topics"`
 }

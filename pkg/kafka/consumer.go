@@ -26,17 +26,18 @@ import (
 	"time"
 )
 
-func NewConsumer(ctx context.Context, wg *sync.WaitGroup, kafkaUrl string, consumerGroup string, topic string, listener func(delivery []byte) error) error {
+func NewConsumer(ctx context.Context, wg *sync.WaitGroup, kafkaUrl string, consumerGroup string, topic string, initTopic bool, listener func(delivery []byte) error) error {
 	broker, err := GetBroker(kafkaUrl)
 	if err != nil {
 		log.Println("ERROR: unable to get broker list", err)
 		return err
 	}
-
-	err = InitTopic(kafkaUrl, topic)
-	if err != nil {
-		log.Println("ERROR: unable to create topic", err)
-		return err
+	if initTopic {
+		err = InitTopic(kafkaUrl, topic)
+		if err != nil {
+			log.Println("ERROR: unable to create topic", err)
+			return err
+		}
 	}
 	r := kafka.NewReader(kafka.ReaderConfig{
 		CommitInterval: 0, //synchronous commits

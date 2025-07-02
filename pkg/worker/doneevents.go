@@ -30,7 +30,7 @@ import (
 
 func StartDoneEventHandling(ctx context.Context, wg *sync.WaitGroup, config Config, libConfig configuration.Config) error {
 	if config.KafkaUrl != "" && config.KafkaUrl != "-" {
-		return kafka.NewConsumer(ctx, wg, config.KafkaUrl, config.KafkaConsumerGroup, config.PermissionsDoneTopic, func(delivery []byte) error {
+		return kafka.NewConsumer(ctx, wg, config.KafkaUrl, config.KafkaConsumerGroup, config.PermissionsDoneTopic, config.InitTopics, func(delivery []byte) error {
 			msg := DoneNotification{}
 			err := json.Unmarshal(delivery, &msg)
 			if err != nil {
