@@ -17,57 +17,29 @@
 package worker
 
 import (
-	"context"
-	"encoding/json"
-	"github.com/SENERGY-Platform/smart-service-module-worker-device-repository/pkg/kafka"
 	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/camunda"
 	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/configuration"
 	"log"
 	"runtime/debug"
-	"sync"
 	"time"
 )
 
-func StartDoneEventHandling(ctx context.Context, wg *sync.WaitGroup, config Config, libConfig configuration.Config) error {
-	if config.KafkaUrl != "" && config.KafkaUrl != "-" {
-		return kafka.NewConsumer(ctx, wg, config.KafkaUrl, config.KafkaConsumerGroup, config.PermissionsDoneTopic, config.InitTopics, func(delivery []byte) error {
-			msg := DoneNotification{}
-			err := json.Unmarshal(delivery, &msg)
-			if err != nil {
-				log.Println("ERROR: unable to interpret kafka msg:", err)
-				debug.PrintStack()
-				return nil //ignore  message
-			}
-			if msg.Command == "PUT" && msg.Handler != "github.com/SENERGY-Platform/permission-search" {
-				eventId := idToEventId(msg.ResourceId)
-				err = camunda.SendEventTrigger(libConfig, eventId, nil)
-				if err != nil {
-					log.Println("ERROR: unable to send event trigger:", err)
-					debug.PrintStack()
-					return err
-				}
-				go func() {
-					time.Sleep(5 * time.Second)
-					err = camunda.SendEventTrigger(libConfig, eventId, nil)
-					if err != nil {
-						log.Println("ERROR: unable to send event trigger:", err)
-						debug.PrintStack()
-					}
-				}()
-			}
-			return nil
-		})
+func triggerDoneEvent(libConfig configuration.Config, resourceId string) {
+	eventId := idToEventId(resourceId)
+	err := camunda.SendEventTrigger(libConfig, eventId, nil)
+	if err == nil {
+		return
 	}
-	return nil
+	go func() {
+		time.Sleep(5 * time.Second)
+		err = camunda.SendEventTrigger(libConfig, eventId, nil)
+		if err != nil {
+			log.Println("ERROR: unable to send event trigger:", err)
+			debug.PrintStack()
+		}
+	}()
 }
 
 func idToEventId(id string) string {
 	return "permission_done_" + id
-}
-
-type DoneNotification struct {
-	ResourceKind string `json:"resource_kind"`
-	ResourceId   string `json:"resource_id"`
-	Handler      string `json:"handler"` // == github.com/SENERGY-Platform/permission-search
-	Command      string `json:"command"` // PUT | DELETE | RIGHTS
 }

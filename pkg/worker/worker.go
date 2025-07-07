@@ -27,10 +27,6 @@ import (
 )
 
 func New(ctx context.Context, wg *sync.WaitGroup, config Config, libConfig configuration.Config, auth *auth.Auth, smartServiceRepo SmartServiceRepo) (*ProcessDeploymentStart, error) {
-	err := StartDoneEventHandling(ctx, wg, config, libConfig)
-	if err != nil {
-		return nil, err
-	}
 	return &ProcessDeploymentStart{config: config, libConfig: libConfig, auth: auth, smartServiceRepo: smartServiceRepo}, nil
 }
 

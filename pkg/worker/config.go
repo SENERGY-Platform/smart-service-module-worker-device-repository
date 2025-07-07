@@ -24,10 +24,4 @@ type Config struct {
 	DefaultNamePrefix           string `json:"default_name_prefix"`
 	AttributeOrigin             string `json:"attribute_origin"`
 	Debug                       bool   `json:"debug"`
-
-	KafkaUrl             string `json:"kafka_url"`
-	KafkaConsumerGroup   string `json:"kafka_consumer_group"`
-	PermissionsDoneTopic string `json:"permissions_done_topic"`
-
-	InitTopics bool `json:"init_topics"`
 }
