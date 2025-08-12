@@ -6,9 +6,8 @@ toolchain go1.24.4
 
 require (
 	github.com/SENERGY-Platform/models/go v0.0.0-20241007061544-de7132ae94e4
-	github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20250107091744-b8a76a4518d2
+	github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20250812092418-dd1d78d97121
 	github.com/julienschmidt/httprouter v1.3.0
-	github.com/segmentio/kafka-go v0.4.47
 )
 
 require (
@@ -17,7 +16,7 @@ require (
 	github.com/SENERGY-Platform/device-repository v0.2.27 // indirect
 	github.com/SENERGY-Platform/go-service-base/struct-logger v0.4.1 // indirect
 	github.com/SENERGY-Platform/permissions-v2 v0.0.38 // indirect
-	github.com/SENERGY-Platform/service-commons v0.0.0-20250624131956-6c08be412ea0 // indirect
+	github.com/SENERGY-Platform/service-commons v0.0.0-20250707072258-a5b49118c926 // indirect
 	github.com/dlclark/regexp2 v1.11.0 // indirect
 	github.com/dop251/goja v0.0.0-20240627195025-eb1f15ee67d2 // indirect
 	github.com/go-openapi/jsonpointer v0.21.0 // indirect
@@ -35,6 +34,7 @@ require (
 	github.com/montanaflynn/stats v0.7.1 // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/pierrec/lz4/v4 v4.1.21 // indirect
+	github.com/segmentio/kafka-go v0.4.47 // indirect
 	github.com/swaggo/files v1.0.1 // indirect
 	github.com/swaggo/http-swagger v1.3.4 // indirect
 	github.com/swaggo/swag v1.16.4 // indirect

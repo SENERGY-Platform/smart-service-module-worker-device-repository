@@ -23,5 +23,4 @@ type Config struct {
 	CreateDeviceGroupModuleType string `json:"create_device_group_module_type"`
 	DefaultNamePrefix           string `json:"default_name_prefix"`
 	AttributeOrigin             string `json:"attribute_origin"`
-	Debug                       bool   `json:"debug"`
 }

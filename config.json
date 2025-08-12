@@ -5,7 +5,6 @@
     "create_device_group_module_type": "device_repository_create_device_group",
     "default_name_prefix": "smart-service generated: ",
     "attribute_origin": "smart-service",
-    "debug": true,
 
     "smart_service_repository_url": "",
     "camunda_url": "",
@@ -19,5 +18,7 @@
     "auth_client_id": "",
     "auth_client_secret": "",
     "token_cache_default_expiration_in_seconds": 60,
-    "token_cache_size_in_mb": 20
+    "token_cache_size_in_mb": 20,
+
+    "log_level": "info"
 }

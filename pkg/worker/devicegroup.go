@@ -19,10 +19,10 @@ package worker
 import (
 	"encoding/json"
 	"fmt"
+	"net/url"
+
 	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/auth"
 	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/model"
-	"log"
-	"net/url"
 )
 
 func (this *ProcessDeploymentStart) handleDeviceGroupCommand(token auth.Token, task model.CamundaExternalTask, deviceIds []string, name string, key *string) (module model.Module, outputs map[string]interface{}, err error) {
@@ -35,11 +35,15 @@ func (this *ProcessDeploymentStart) handleDeviceGroupCommand(token auth.Token, t
 
 const DeviceGroupIdOutputFieldName = "device_group_id"
 
+func idToEventId(id string) string {
+	return "permission_done_" + id
+}
+
 func (this *ProcessDeploymentStart) handleDeviceGroupCreate(token auth.Token, task model.CamundaExternalTask, deviceIds []string, name string, keys []string) (module model.Module, outputs map[string]interface{}, err error) {
 	outputs = map[string]interface{}{}
 	deviceGroupId, err := this.createDeviceGroup(token, task, deviceIds, name, this.getWaitSetting(task))
 	if err != nil {
-		log.Println("ERROR:", err)
+		this.libConfig.GetLogger().Error("error in handleDeviceGroupCreate", "error", err)
 		return module, outputs, err
 	}
 	outputs["done_event"] = idToEventId(deviceGroupId)
@@ -74,20 +78,20 @@ func (this *ProcessDeploymentStart) handleDeviceGroupCommandWithKey(token auth.T
 
 	deviceGroupIdInterface, ok := module.ModuleData[DeviceGroupIdOutputFieldName]
 	if !ok {
-		log.Printf("WARNING: device-group-id output not found in module: \n %#v", module)
+		this.libConfig.GetLogger().Warn("device-group-id output not found in module", "error", err, "module", fmt.Sprintf("%#v", module))
 		return this.handleDeviceGroupCreate(token, task, deviceIds, name, []string{key})
 	}
 	deviceGroupId, ok := deviceGroupIdInterface.(string)
 	if !ok {
 		err = fmt.Errorf("module device-group-id output is not string: \n %#v", module)
-		log.Println("ERROR: ", err)
+		this.libConfig.GetLogger().Error("error in handleDeviceGroupCommandWithKey", "error", err)
 		return module, outputs, err
 	}
 
 	outputs = module.ModuleData
 	err = this.updateDeviceGroup(token, task, deviceIds, name, deviceGroupId, this.getWaitSetting(task))
 	if err != nil {
-		log.Println("ERROR:", err)
+		this.libConfig.GetLogger().Error("error in handleDeviceGroupCommandWithKey", "error", err)
 		return module, outputs, err
 	}
 
@@ -100,17 +104,15 @@ func (this *ProcessDeploymentStart) getExistingModule(processInstanceId string, 
 		TypeFilter: &moduleType,
 	})
 	if err != nil {
-		log.Println("ERROR:", err)
+		this.libConfig.GetLogger().Error("error in getExistingModule", "error", err)
 		return module, false, err
 	}
-	if this.config.Debug {
-		log.Printf("DEBUG: existing module request: %v, %v, %v, \n %#v", processInstanceId, key, moduleType, existingModules)
-	}
+	this.libConfig.GetLogger().Debug("existing module request", "processInstanceId", processInstanceId, "key", key, "moduleType", moduleType, "existingModules", existingModules)
 	if len(existingModules) == 0 {
 		return module, false, nil
 	}
 	if len(existingModules) > 1 {
-		log.Printf("WARNING: more than one existing module found: %v, %v, %v, \n %#v", processInstanceId, key, moduleType, existingModules)
+		this.libConfig.GetLogger().Warn("more than one existing module found", "processInstanceId", processInstanceId, "key", key, "moduleType", moduleType, "existingModules", existingModules)
 	}
 	module.SmartServiceModuleInit = existingModules[0].SmartServiceModuleInit
 	module.ProcesInstanceId = processInstanceId

@@ -19,11 +19,11 @@ package worker
 import (
 	"encoding/json"
 	"fmt"
-	devicemodel "github.com/SENERGY-Platform/models/go/models"
-	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/model"
-	"log"
 	"strconv"
 	"strings"
+
+	devicemodel "github.com/SENERGY-Platform/models/go/models"
+	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/model"
 )
 
 const DeviceIdPrefix = devicemodel.URN_PREFIX + "device:"
@@ -53,7 +53,7 @@ func (this *ProcessDeploymentStart) getWaitSetting(task model.CamundaExternalTas
 
 	wait, err := strconv.ParseBool(waitStr)
 	if err != nil {
-		log.Printf("WARNING: unable to parse wait value %#v --> default to false", waitStr)
+		this.libConfig.GetLogger().Warn(fmt.Sprintf("unable to parse wait value %#v --> default to false", waitStr))
 		return false
 	}
 	return wait
