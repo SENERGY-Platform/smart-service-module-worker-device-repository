@@ -6,7 +6,7 @@ toolchain go1.24.4
 
 require (
 	github.com/SENERGY-Platform/models/go v0.0.0-20241007061544-de7132ae94e4
-	github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20250812092418-dd1d78d97121
+	github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20250826124800-822d514cda3d
 	github.com/julienschmidt/httprouter v1.3.0
 )
 
