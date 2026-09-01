@@ -17,6 +17,7 @@
 package worker
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/url"
@@ -25,11 +26,11 @@ import (
 	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/model"
 )
 
-func (this *ProcessDeploymentStart) handleDeviceGroupCommand(token auth.Token, task model.CamundaExternalTask, deviceIds []string, name string, key *string) (module model.Module, outputs map[string]interface{}, err error) {
+func (this *ProcessDeploymentStart) handleDeviceGroupCommand(ctx context.Context, token auth.Token, task model.CamundaExternalTask, deviceIds []string, name string, key *string) (module model.Module, outputs map[string]interface{}, err error) {
 	if key != nil {
-		return this.handleDeviceGroupCommandWithKey(token, task, deviceIds, name, *key)
+		return this.handleDeviceGroupCommandWithKey(ctx, token, task, deviceIds, name, *key)
 	} else {
-		return this.handleDeviceGroupCreate(token, task, deviceIds, name, []string{})
+		return this.handleDeviceGroupCreate(ctx, token, task, deviceIds, name, []string{})
 	}
 }
 
@@ -39,11 +40,11 @@ func idToEventId(id string) string {
 	return "permission_done_" + id
 }
 
-func (this *ProcessDeploymentStart) handleDeviceGroupCreate(token auth.Token, task model.CamundaExternalTask, deviceIds []string, name string, keys []string) (module model.Module, outputs map[string]interface{}, err error) {
+func (this *ProcessDeploymentStart) handleDeviceGroupCreate(ctx context.Context, token auth.Token, task model.CamundaExternalTask, deviceIds []string, name string, keys []string) (module model.Module, outputs map[string]interface{}, err error) {
 	outputs = map[string]interface{}{}
-	deviceGroupId, err := this.createDeviceGroup(token, task, deviceIds, name, this.getWaitSetting(task))
+	deviceGroupId, err := this.createDeviceGroup(ctx, token, task, deviceIds, name, this.getWaitSetting(task))
 	if err != nil {
-		this.libConfig.GetLogger().Error("error in handleDeviceGroupCreate", "error", err)
+		this.libConfig.GetLogger().ErrorContext(ctx, "error in handleDeviceGroupCreate", "error", err)
 		return module, outputs, err
 	}
 	outputs["done_event"] = idToEventId(deviceGroupId)
@@ -69,50 +70,50 @@ func (this *ProcessDeploymentStart) handleDeviceGroupCreate(token auth.Token, ta
 	return module, outputs, nil
 }
 
-func (this *ProcessDeploymentStart) handleDeviceGroupCommandWithKey(token auth.Token, task model.CamundaExternalTask, deviceIds []string, name string, key string) (module model.Module, outputs map[string]interface{}, err error) {
-	module, exists, err := this.getExistingModule(task.ProcessInstanceId, key, this.config.CreateDeviceGroupModuleType)
+func (this *ProcessDeploymentStart) handleDeviceGroupCommandWithKey(ctx context.Context, token auth.Token, task model.CamundaExternalTask, deviceIds []string, name string, key string) (module model.Module, outputs map[string]interface{}, err error) {
+	module, exists, err := this.getExistingModule(ctx, task.ProcessInstanceId, key, this.config.CreateDeviceGroupModuleType)
 	if !exists {
-		return this.handleDeviceGroupCreate(token, task, deviceIds, name, []string{key})
+		return this.handleDeviceGroupCreate(ctx, token, task, deviceIds, name, []string{key})
 	}
 	setModuleUpdateVersion(&module)
 
 	deviceGroupIdInterface, ok := module.ModuleData[DeviceGroupIdOutputFieldName]
 	if !ok {
-		this.libConfig.GetLogger().Warn("device-group-id output not found in module", "error", err, "module", fmt.Sprintf("%#v", module))
-		return this.handleDeviceGroupCreate(token, task, deviceIds, name, []string{key})
+		this.libConfig.GetLogger().WarnContext(ctx, "device-group-id output not found in module", "error", err, "module", fmt.Sprintf("%#v", module))
+		return this.handleDeviceGroupCreate(ctx, token, task, deviceIds, name, []string{key})
 	}
 	deviceGroupId, ok := deviceGroupIdInterface.(string)
 	if !ok {
 		err = fmt.Errorf("module device-group-id output is not string: \n %#v", module)
-		this.libConfig.GetLogger().Error("error in handleDeviceGroupCommandWithKey", "error", err)
+		this.libConfig.GetLogger().ErrorContext(ctx, "error in handleDeviceGroupCommandWithKey", "error", err)
 		return module, outputs, err
 	}
 
 	outputs = module.ModuleData
-	err = this.updateDeviceGroup(token, task, deviceIds, name, deviceGroupId, this.getWaitSetting(task))
+	err = this.updateDeviceGroup(ctx, token, task, deviceIds, name, deviceGroupId, this.getWaitSetting(task))
 	if err != nil {
-		this.libConfig.GetLogger().Error("error in handleDeviceGroupCommandWithKey", "error", err)
+		this.libConfig.GetLogger().ErrorContext(ctx, "error in handleDeviceGroupCommandWithKey", "error", err)
 		return module, outputs, err
 	}
 
 	return module, outputs, nil
 }
 
-func (this *ProcessDeploymentStart) getExistingModule(processInstanceId string, key string, moduleType string) (module model.Module, exists bool, err error) {
-	existingModules, err := this.smartServiceRepo.ListExistingModules(processInstanceId, model.ModulQuery{
+func (this *ProcessDeploymentStart) getExistingModule(ctx context.Context, processInstanceId string, key string, moduleType string) (module model.Module, exists bool, err error) {
+	existingModules, err := this.smartServiceRepo.ListExistingModules(ctx, processInstanceId, model.ModulQuery{
 		KeyFilter:  &key,
 		TypeFilter: &moduleType,
 	})
 	if err != nil {
-		this.libConfig.GetLogger().Error("error in getExistingModule", "error", err)
+		this.libConfig.GetLogger().ErrorContext(ctx, "error in getExistingModule", "error", err)
 		return module, false, err
 	}
-	this.libConfig.GetLogger().Debug("existing module request", "processInstanceId", processInstanceId, "key", key, "moduleType", moduleType, "existingModules", existingModules)
+	this.libConfig.GetLogger().DebugContext(ctx, "existing module request", "processInstanceId", processInstanceId, "key", key, "moduleType", moduleType, "existingModules", existingModules)
 	if len(existingModules) == 0 {
 		return module, false, nil
 	}
 	if len(existingModules) > 1 {
-		this.libConfig.GetLogger().Warn("more than one existing module found", "processInstanceId", processInstanceId, "key", key, "moduleType", moduleType, "existingModules", existingModules)
+		this.libConfig.GetLogger().WarnContext(ctx, "more than one existing module found", "processInstanceId", processInstanceId, "key", key, "moduleType", moduleType, "existingModules", existingModules)
 	}
 	module.SmartServiceModuleInit = existingModules[0].SmartServiceModuleInit
 	module.ProcesInstanceId = processInstanceId

@@ -38,26 +38,26 @@ type ProcessDeploymentStart struct {
 }
 
 type SmartServiceRepo interface {
-	GetInstanceUser(instanceId string) (userId string, err error)
-	UseModuleDeleteInfo(info model.ModuleDeleteInfo) error
-	ListExistingModules(processInstanceId string, query model.ModulQuery) (result []model.SmartServiceModule, err error)
+	GetInstanceUser(ctx context.Context, instanceId string) (userId string, err error)
+	UseModuleDeleteInfo(ctx context.Context, info model.ModuleDeleteInfo) error
+	ListExistingModules(ctx context.Context, processInstanceId string, query model.ModulQuery) (result []model.SmartServiceModule, err error)
 }
 
-func (this *ProcessDeploymentStart) Do(task model.CamundaExternalTask) (modules []model.Module, outputs map[string]interface{}, err error) {
-	userId, err := this.smartServiceRepo.GetInstanceUser(task.ProcessInstanceId)
+func (this *ProcessDeploymentStart) Do(ctx context.Context, task model.CamundaExternalTask) (modules []model.Module, outputs map[string]interface{}, err error) {
+	userId, err := this.smartServiceRepo.GetInstanceUser(ctx, task.ProcessInstanceId)
 	if err != nil {
-		this.libConfig.GetLogger().Error("unable to get instance user", "error", err)
+		this.libConfig.GetLogger().ErrorContext(ctx, "unable to get instance user", "error", err)
 		return modules, outputs, err
 	}
 	token, err := this.auth.ExchangeUserToken(userId)
 	if err != nil {
-		this.libConfig.GetLogger().Error("unable to exchange user token", "error", err)
+		this.libConfig.GetLogger().ErrorContext(ctx, "unable to exchange user token", "error", err)
 		return modules, outputs, err
 	}
 
 	deviceGroupDeviceIds, createDeviceGroup, err := this.getDeviceGroupDeviceIds(task)
 	if err != nil {
-		this.libConfig.GetLogger().Error("error in ProcessDeploymentStart.Do", "error", err)
+		this.libConfig.GetLogger().ErrorContext(ctx, "error in ProcessDeploymentStart.Do", "error", err)
 		return modules, outputs, err
 	}
 
@@ -68,7 +68,7 @@ func (this *ProcessDeploymentStart) Do(task model.CamundaExternalTask) (modules 
 	key := this.getModuleKey(task)
 
 	if createDeviceGroup {
-		module, returnData, err := this.handleDeviceGroupCommand(token, task, deviceGroupDeviceIds, name, key)
+		module, returnData, err := this.handleDeviceGroupCommand(ctx, token, task, deviceGroupDeviceIds, name, key)
 		if err != nil {
 			return modules, returnData, err
 		}
@@ -81,13 +81,13 @@ func (this *ProcessDeploymentStart) Do(task model.CamundaExternalTask) (modules 
 	return modules, outputs, err
 }
 
-func (this *ProcessDeploymentStart) Undo(modules []model.Module, reason error) {
-	this.libConfig.GetLogger().Debug("UNDO", "reason", reason)
+func (this *ProcessDeploymentStart) Undo(ctx context.Context, modules []model.Module, reason error) {
+	this.libConfig.GetLogger().DebugContext(ctx, "UNDO", "reason", reason)
 	for _, module := range modules {
 		if module.DeleteInfo != nil && !isUpdate(module) {
-			err := this.smartServiceRepo.UseModuleDeleteInfo(*module.DeleteInfo)
+			err := this.smartServiceRepo.UseModuleDeleteInfo(ctx, *module.DeleteInfo)
 			if err != nil {
-				this.libConfig.GetLogger().Error("error in Undo", "error", err, "stack", string(debug.Stack()))
+				this.libConfig.GetLogger().ErrorContext(ctx, "error in Undo", "error", err, "stack", string(debug.Stack()))
 			}
 		}
 	}

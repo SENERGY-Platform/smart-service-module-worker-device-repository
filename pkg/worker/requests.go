@@ -18,8 +18,10 @@ package worker
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
+	"github.com/SENERGY-Platform/gin-middleware/otelx"
 	devicemodel "github.com/SENERGY-Platform/models/go/models"
 	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/auth"
 	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/model"
@@ -29,7 +31,7 @@ import (
 	"runtime/debug"
 )
 
-func (this *ProcessDeploymentStart) createDeviceGroup(token auth.Token, task model.CamundaExternalTask, ids []string, name string, wait bool) (groupId string, err error) {
+func (this *ProcessDeploymentStart) createDeviceGroup(ctx context.Context, token auth.Token, task model.CamundaExternalTask, ids []string, name string, wait bool) (groupId string, err error) {
 	if ids == nil {
 		ids = []string{}
 	}
@@ -61,7 +63,7 @@ func (this *ProcessDeploymentStart) createDeviceGroup(token auth.Token, task mod
 		},
 	}
 	if len(ids) > 0 {
-		deviceGroup.Criteria, err = this.getDeviceGroupCriteria(token, ids)
+		deviceGroup.Criteria, err = this.getDeviceGroupCriteria(ctx, token, ids)
 	}
 
 	if err != nil {
@@ -78,6 +80,11 @@ func (this *ProcessDeploymentStart) createDeviceGroup(token auth.Token, task mod
 		query = "?wait=true"
 	}
 	req, err := http.NewRequest("POST", this.config.DeviceManagerUrl+"/device-groups"+query, payload)
+	if err != nil {
+		debug.PrintStack()
+		return groupId, err
+	}
+	err = otelx.InjectContextToRequest(ctx, req)
 	if err != nil {
 		debug.PrintStack()
 		return groupId, err
@@ -101,7 +108,7 @@ func (this *ProcessDeploymentStart) createDeviceGroup(token auth.Token, task mod
 	return
 }
 
-func (this *ProcessDeploymentStart) updateDeviceGroup(token auth.Token, task model.CamundaExternalTask, ids []string, name string, groupId string, wait bool) (err error) {
+func (this *ProcessDeploymentStart) updateDeviceGroup(ctx context.Context, token auth.Token, task model.CamundaExternalTask, ids []string, name string, groupId string, wait bool) (err error) {
 	if ids == nil {
 		ids = []string{}
 	}
@@ -134,7 +141,7 @@ func (this *ProcessDeploymentStart) updateDeviceGroup(token auth.Token, task mod
 		},
 	}
 	if len(ids) > 0 {
-		deviceGroup.Criteria, err = this.getDeviceGroupCriteria(token, ids)
+		deviceGroup.Criteria, err = this.getDeviceGroupCriteria(ctx, token, ids)
 	}
 
 	if err != nil {
@@ -151,6 +158,11 @@ func (this *ProcessDeploymentStart) updateDeviceGroup(token auth.Token, task mod
 		query = "?wait=true"
 	}
 	req, err := http.NewRequest("PUT", this.config.DeviceManagerUrl+"/device-groups/"+url.PathEscape(groupId)+query, payload)
+	if err != nil {
+		debug.PrintStack()
+		return err
+	}
+	err = otelx.InjectContextToRequest(ctx, req)
 	if err != nil {
 		debug.PrintStack()
 		return err
@@ -172,7 +184,7 @@ func (this *ProcessDeploymentStart) updateDeviceGroup(token auth.Token, task mod
 	return
 }
 
-func (this *ProcessDeploymentStart) getDeviceGroupCriteria(token auth.Token, ids []string) (result []devicemodel.DeviceGroupFilterCriteria, err error) {
+func (this *ProcessDeploymentStart) getDeviceGroupCriteria(ctx context.Context, token auth.Token, ids []string) (result []devicemodel.DeviceGroupFilterCriteria, err error) {
 	payload := new(bytes.Buffer)
 	err = json.NewEncoder(payload).Encode(ids)
 	if err != nil {
@@ -180,6 +192,11 @@ func (this *ProcessDeploymentStart) getDeviceGroupCriteria(token auth.Token, ids
 		return result, err
 	}
 	req, err := http.NewRequest("POST", this.config.DeviceSelectionUrl+"/device-group-helper", payload)
+	if err != nil {
+		debug.PrintStack()
+		return result, err
+	}
+	err = otelx.InjectContextToRequest(ctx, req)
 	if err != nil {
 		debug.PrintStack()
 		return result, err

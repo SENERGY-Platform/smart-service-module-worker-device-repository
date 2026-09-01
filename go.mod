@@ -3,8 +3,9 @@ module github.com/SENERGY-Platform/smart-service-module-worker-device-repository
 go 1.26
 
 require (
+	github.com/SENERGY-Platform/gin-middleware v0.14.1
 	github.com/SENERGY-Platform/models/go v0.0.0-20260710115411-5b8e00d6e038
-	github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20260827065540-cdfae7f76927
+	github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20260901044136-21c33469053e
 	github.com/julienschmidt/httprouter v1.3.0
 )
 
@@ -12,7 +13,6 @@ require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/SENERGY-Platform/developer-notifications v0.0.6 // indirect
 	github.com/SENERGY-Platform/device-repository v0.3.5 // indirect
-	github.com/SENERGY-Platform/gin-middleware v0.14.1 // indirect
 	github.com/SENERGY-Platform/go-service-base/struct-logger v0.8.0 // indirect
 	github.com/SENERGY-Platform/mgw-cloud-proxy/cert-manager/lib v0.0.4 // indirect
 	github.com/SENERGY-Platform/permissions-v2 v0.0.47 // indirect
@@ -103,5 +103,3 @@ require (
 	google.golang.org/grpc v1.82.1 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 )
-
-//replace github.com/SENERGY-Platform/smart-service-module-worker-lib => ../smart-service-module-worker-lib

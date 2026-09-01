@@ -79,6 +79,19 @@ func (this *SmartServiceRepoMock) Start(ctx context.Context, wg *sync.WaitGroup)
 func (this *SmartServiceRepoMock) getRouter() http.Handler {
 	router := httprouter.New()
 
+	router.GET("/instances-by-process-id/:id", func(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+		temp, _ := io.ReadAll(request.Body)
+		this.logRequest(Request{
+			Method:   request.Method,
+			Endpoint: request.URL.Path,
+			Message:  string(temp),
+		})
+		json.NewEncoder(writer).Encode(map[string]interface{}{
+			"id":      params.ByName("id"),
+			"user_id": userId,
+		})
+	})
+
 	router.PUT("/instances-by-process-id/:id/error", func(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 		temp, _ := io.ReadAll(request.Body)
 		this.logRequest(Request{
